@@ -1,5 +1,18 @@
 sql-stuff
 =========
+* Delete data from tables
+```sql
+EXEC sp_MSforeachtable @command1='delete from ?', @whereand=' and o.name like ''tbcip%'''
+```
+* Disable/enable constraints
+```sql
+-- DISABLE
+EXEC sp_MSforeachtable @command1='ALTER TABLE ? NOCHECK CONSTRAINT ALL' ,@whereand=' and o.name like ''tbcip%'''
+-- ENABLE
+EXEC sp_MSforeachtable @command1='print ''?''', @command2='ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all', @whereand=' and o.name like ''tbcip%'' '
+```
+
+
 * Restore database
 ```sql
 USE master;
