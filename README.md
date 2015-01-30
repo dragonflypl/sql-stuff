@@ -29,17 +29,17 @@ RESTORE DATABASE dbname
 /* Drop all non-system stored procs */
 DECLARE @name VARCHAR(128)
 DECLARE @SQL VARCHAR(254)
-DECLARE	@spPrefix VARCHAR(10)
+DECLARE @spPrefix VARCHAR(10)
 SET @spPrefix = 'SPCIP_%'
 
-SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND category = 0 ORDER BY [name])
+SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND category = 0 AND [name] LIKE @spPrefix ORDER BY [name])
 
 WHILE @name is not null
 BEGIN
     SELECT @SQL = 'DROP PROCEDURE [dbo].[' + RTRIM(@name) +']'
     EXEC (@SQL)
     PRINT 'Dropped Procedure: ' + @name
-    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND category = 0 AND [name] > @name ORDER BY [name])
+    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND category = 0 AND [name] LIKE @spPrefix AND [name] > @name ORDER BY [name])
 END
 GO
 
@@ -56,7 +56,7 @@ BEGIN
     SELECT @SQL = 'DROP VIEW [dbo].[' + RTRIM(@name) +']'
     EXEC (@SQL)
     PRINT 'Dropped View: ' + @name
-    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'V' AND category = 0 AND [name] > @name ORDER BY [name])
+    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'V' AND category = 0 AND [name] LIKE @viewsPrefix  AND [name] > @name ORDER BY [name])
 END
 GO
 
@@ -66,14 +66,14 @@ DECLARE @SQL VARCHAR(254)
 DECLARE @fnPrefix VARCHAR(10)
 SET @fnPrefix = 'FNCIP_%'
 
-SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 ORDER BY [name])
+SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 AND [name] LIKE @fnPrefix ORDER BY [name])
 
 WHILE @name IS NOT NULL
 BEGIN
     SELECT @SQL = 'DROP FUNCTION [dbo].[' + RTRIM(@name) +']'
     EXEC (@SQL)
     PRINT 'Dropped Function: ' + @name
-    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 AND [name] > @name ORDER BY [name])
+    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 AND [name] LIKE @fnPrefix AND [name] > @name ORDER BY [name])
 END
 GO
 
@@ -96,7 +96,7 @@ BEGIN
         PRINT 'Dropped FK Constraint: ' + @constraint + ' on ' + @name
         SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_NAME <> @constraint AND TABLE_NAME = @name ORDER BY CONSTRAINT_NAME)
     END
-SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'FOREIGN KEY' ORDER BY TABLE_NAME)
+SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME LIKE @tablesPrefix AND constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'FOREIGN KEY' ORDER BY TABLE_NAME)
 END
 GO
 
@@ -107,7 +107,7 @@ DECLARE @SQL VARCHAR(254)
 DECLARE @tablesPrefix VARCHAR(10)
 SET @tablesPrefix = 'TBCIP_%'
 
-SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME LIKE @tablesPrefix AND  constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' ORDER BY TABLE_NAME)
+SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME LIKE @tablesPrefix AND constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' ORDER BY TABLE_NAME)
 
 WHILE @name IS NOT NULL
 BEGIN
@@ -119,7 +119,7 @@ BEGIN
         PRINT 'Dropped PK Constraint: ' + @constraint + ' on ' + @name
         SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND CONSTRAINT_NAME <> @constraint AND TABLE_NAME = @name ORDER BY CONSTRAINT_NAME)
     END
-SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' ORDER BY TABLE_NAME)
+SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME LIKE @tablesPrefix AND constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' ORDER BY TABLE_NAME)
 END
 GO
 
@@ -129,14 +129,14 @@ DECLARE @SQL VARCHAR(254)
 DECLARE @tablesPrefix VARCHAR(10)
 SET @tablesPrefix = 'TBCIP_%'
 
-SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'U' AND category = 0 ORDER BY [name])
+SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [name] LIKE @tablesPrefix AND [type] = 'U' AND category = 0 ORDER BY [name])
 
 WHILE @name IS NOT NULL
 BEGIN
     SELECT @SQL = 'DROP TABLE [dbo].[' + RTRIM(@name) +']'
     EXEC (@SQL)
     PRINT 'Dropped Table: ' + @name
-    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'U' AND category = 0 AND [name] > @name ORDER BY [name])
+    SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [name] LIKE @tablesPrefix AND [type] = 'U' AND category = 0 AND [name] > @name ORDER BY [name])
 END
 GO
 ```
