@@ -37,7 +37,7 @@ SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND categ
 WHILE @name is not null
 BEGIN
     SELECT @SQL = 'DROP PROCEDURE [dbo].[' + RTRIM(@name) +']'
-    EXEC (@SQL)
+    -- EXEC (@SQL)
     PRINT 'Dropped Procedure: ' + @name
     SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'P' AND category = 0 AND [name] LIKE @spPrefix AND [name] > @name ORDER BY [name])
 END
@@ -54,7 +54,7 @@ SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'V' AND categ
 WHILE @name IS NOT NULL
 BEGIN
     SELECT @SQL = 'DROP VIEW [dbo].[' + RTRIM(@name) +']'
-    EXEC (@SQL)
+    -- EXEC (@SQL)
     PRINT 'Dropped View: ' + @name
     SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] = 'V' AND category = 0 AND [name] LIKE @viewsPrefix  AND [name] > @name ORDER BY [name])
 END
@@ -71,7 +71,7 @@ SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF
 WHILE @name IS NOT NULL
 BEGIN
     SELECT @SQL = 'DROP FUNCTION [dbo].[' + RTRIM(@name) +']'
-    EXEC (@SQL)
+    -- EXEC (@SQL)
     PRINT 'Dropped Function: ' + @name
     SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [type] IN (N'FN', N'IF', N'TF', N'FS', N'FT') AND category = 0 AND [name] LIKE @fnPrefix AND [name] > @name ORDER BY [name])
 END
@@ -92,7 +92,7 @@ BEGIN
     WHILE @constraint IS NOT NULL
     BEGIN
         SELECT @SQL = 'ALTER TABLE [dbo].[' + RTRIM(@name) +'] DROP CONSTRAINT [' + RTRIM(@constraint) +']'
-        EXEC (@SQL)
+        -- EXEC (@SQL)
         PRINT 'Dropped FK Constraint: ' + @constraint + ' on ' + @name
         SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_NAME <> @constraint AND TABLE_NAME = @name ORDER BY CONSTRAINT_NAME)
     END
@@ -115,7 +115,7 @@ BEGIN
     WHILE @constraint is not null
     BEGIN
         SELECT @SQL = 'ALTER TABLE [dbo].[' + RTRIM(@name) +'] DROP CONSTRAINT [' + RTRIM(@constraint)+']'
-        EXEC (@SQL)
+        -- EXEC (@SQL)
         PRINT 'Dropped PK Constraint: ' + @constraint + ' on ' + @name
         SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND CONSTRAINT_NAME <> @constraint AND TABLE_NAME = @name ORDER BY CONSTRAINT_NAME)
     END
@@ -134,7 +134,7 @@ SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [name] LIKE @tablesPre
 WHILE @name IS NOT NULL
 BEGIN
     SELECT @SQL = 'DROP TABLE [dbo].[' + RTRIM(@name) +']'
-    EXEC (@SQL)
+    -- EXEC (@SQL)
     PRINT 'Dropped Table: ' + @name
     SELECT @name = (SELECT TOP 1 [name] FROM sysobjects WHERE [name] LIKE @tablesPrefix AND [type] = 'U' AND category = 0 AND [name] > @name ORDER BY [name])
 END
